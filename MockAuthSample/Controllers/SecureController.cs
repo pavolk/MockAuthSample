@@ -9,7 +9,6 @@ namespace AccountManager.Controllers
         // GET: api/Secure
         [HttpGet("Secure")]
         [Authorize]
-        //[Authorize(AuthenticationSchemes = "Test")]
         public ActionResult GetSecure()
         {
             return Ok();

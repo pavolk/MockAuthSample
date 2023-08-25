@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,7 @@ public class AuthTests
 {
     private static WebApplicationFactory<MockAuthSample.Program> factory;
 
-    [ClassInitialize]
-    public static void ClassInit(TestContext context)
+    static AuthTests()
     {
         factory = new WebApplicationFactory<MockAuthSample.Program>();
     }
@@ -29,11 +29,19 @@ public class AuthTests
         var client = factory.WithWebHostBuilder(builder =>
             {
                 builder
+                .UseTestServer()
                 .ConfigureTestServices(services =>
                 {
                     services.AddAuthentication("Test")
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                             "Test", options => { });
+                    services.AddAuthorization(opts =>
+                    {
+                        opts.DefaultPolicy = new AuthorizationPolicyBuilder()
+                            .AddAuthenticationSchemes("Test")
+                            .RequireAuthenticatedUser()
+                            .Build();
+                    });
                 });
             })
             .CreateClient(new WebApplicationFactoryClientOptions
