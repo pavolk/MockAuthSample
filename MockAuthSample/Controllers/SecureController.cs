@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Diagnostics;
 
 namespace AccountManager.Controllers
 {
@@ -11,6 +12,12 @@ namespace AccountManager.Controllers
         [Authorize]
         public ActionResult GetSecure()
         {
+            var user = Request.HttpContext.User;
+
+            foreach (var c in user.Claims) {
+                Debug.WriteLine($"GetSecure: {c.Type} -> {c.Value}");
+            }
+
             return Ok();
         }
     }
